@@ -6,6 +6,7 @@ from vk_api import VkUpload
 from vk_api.longpoll import VkLongPoll, VkEventType
 from random import randint
 
+#  4c186333ef3f740f9af02180d48bebec88587fa76f705287325595523e6a2d0dc4032107976de40d894a8
 tokenbot = ""
 vk_session = vk_api.VkApi(token=tokenbot)
 
@@ -17,6 +18,8 @@ upload = VkUpload(vk_session)
 attachments = []
 attachments.append('doc68106853_535852671')
 
+
+
 while True:
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
@@ -26,6 +29,7 @@ while True:
                     vk.messages.send( #Отправляем собщение
                         user_id=event.user_id,
                         random_id=randint(1, 10**17),
+                        keyboard=open("keyboards/keyboard_start.json", "r", encoding="UTF-8").read(),
                         message="""
                         Возможные команды:
                         - Тест
@@ -37,7 +41,8 @@ while True:
                     vk.messages.send( #Отправляем собщение
                         chat_id=event.chat_id,
                         random_id=randint(1, 10**17),
-                                    message='Сигнал получен\n Отвечаю: Бип-Буп-Бип'
+                        keyboard=open("keyboards/keyboard_start.json", "r", encoding="UTF-8").read(),
+                        message='Сигнал получен\n Отвечаю: Бип-Буп-Бип'
                     )
             elif event.text.lower() == 'тест': #Если написали заданную фразу
                 if event.from_user:
