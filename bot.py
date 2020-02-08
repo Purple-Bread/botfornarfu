@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 import requests
 import vk_api
+import vk
 import time
 from vk_api import VkUpload 
 from vk_api.longpoll import VkLongPoll, VkEventType
@@ -9,14 +10,67 @@ from random import randint
 #  4c186333ef3f740f9af02180d48bebec88587fa76f705287325595523e6a2d0dc4032107976de40d894a8
 tokenbot = ""
 vk_session = vk_api.VkApi(token=tokenbot)
-
 longpoll = VkLongPoll(vk_session)
-vk = vk_session.get_api()
-
+vk=vk_session.get_api()
 upload = VkUpload(vk_session)
-
 attachments = []
 attachments.append('doc68106853_535852671')
+
+
+
+def neponatno():
+    vk.messages.send(
+        user_id=event.user_id,
+        random_id=randint(1, 10 ** 17),
+        attachment=','.join(attachments),
+        message='Это шо такое? Напиши "помощь"',
+    )
+def pomosh():
+    vk.messages.send(  # Отправляем собщение
+        user_id=event.user_id,
+        random_id=randint(1, 10 ** 17),
+        keyboard=open("keyboards/keyboard_start.json", "r", encoding="UTF-8").read(),
+        message=""" 
+                            Возможные команды:
+                            - Тест
+                            - Меню
+                            - Помощь
+                            """
+    )
+def test():
+    vk.messages.send(  # Отправляем собщение
+        user_id=event.user_id,
+        random_id=randint(1, 10 ** 17),
+        message='Сигнал получен\n Отвечаю: Бип-Буп-Бип'
+    )
+def valentinka():
+    for event in longpoll.listen():
+        if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
+            if event.text.lower() == 'да':
+                # прохождение анкеты
+                vk.messages.send(
+                    user_id=event.user_id,
+                    random_id=randint(1, 10 ** 17),
+                    message='Спасибо!'
+                )
+                break
+            elif event.text.lower() == 'нет':
+                vk.messages.send(
+                    user_id=event.user_id,
+                    random_id=randint(1, 10 ** 17),
+                    message='Очень жаль'  # и оповещение о предназначении анкеты
+                )
+                break
+            else:
+                neponatno()
+                break
+def menu():
+    vk.messages.send(  # Отправляем собщение
+        user_id=event.user_id,
+        random_id=randint(1, 10 ** 17),
+        keyboard=open("keyboards/keyboard_menu.json", "r", encoding="UTF-8").read(),
+        message='---Меню---',
+    )
 
 
 
@@ -26,97 +80,37 @@ while True:
        #Слушаем longpoll, если пришло сообщение то:	
             if event.text.lower() == 'помощь': #Если написали заданную фразу
                 if event.from_user:
-                    vk.messages.send( #Отправляем собщение
-                        user_id=event.user_id,
-                        random_id=randint(1, 10**17),
-                        keyboard=open("keyboards/keyboard_start.json", "r", encoding="UTF-8").read(),
-                        message="""
-                        Возможные команды:
-                        - Тест
-                        - Менюшка
-                        - Помощь
-                        """
-                    )
-                elif event.from_chat:
-                    vk.messages.send( #Отправляем собщение
-                        chat_id=event.chat_id,
-                        random_id=randint(1, 10**17),
-                        keyboard=open("keyboards/keyboard_start.json", "r", encoding="UTF-8").read(),
-                        message='Сигнал получен\n Отвечаю: Бип-Буп-Бип'
-                    )
+                    pomosh()
+
             elif event.text.lower() == 'тест': #Если написали заданную фразу
                 if event.from_user:
-                    vk.messages.send( #Отправляем собщение
-                        user_id=event.user_id,
-                        random_id=randint(1, 10**17),
-                        message='Сигнал получен\n Отвечаю: Бип-Буп-Бип'
-                    )
-                elif event.from_chat:
-                    vk.messages.send( #Отправляем собщение
-                        chat_id=event.chat_id,
-                        random_id=randint(1, 10**17),
-                        message='Сигнал получен\n Отвечаю: Бип-Буп-Бип'
-                    )
-            elif event.text.lower() == 'менюшка': #Если написали заданную фразу
+                    test()
+            elif event.text.lower() == 'меню': #Если написали заданную фразу
                 if event.from_user:
-                    vk.messages.send( #Отправляем собщение
-                        user_id=event.user_id,
-                        random_id=randint(1, 10**17),
-                        message='Выбери: 1, 2 или 3?',
-                    )
-                elif event.from_chat:
-                    vk.messages.send( #Отправляем собщение
-                        chat_id=event.chat_id,
-                        random_id=randint(1, 10**17),
-                        message='Выбери: 1, 2 или 3?',
-                        )
+                    menu()
                 for event in longpoll.listen():
                     if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
-                        if event.text.lower() == '1' or event.text.lower() == '2' or event.text.lower() == '3': #Если написали заданную фразу              
+                        if event.text.lower() == 'валентинка':  # Если написали заданную фразу
                             if event.from_user:
-                                vk.messages.send( #Отправляем собщение
+                                vk.messages.send(
                                     user_id=event.user_id,
-                                    random_id=randint(1, 10**17),
-                                    message='Ты выбрал '+ event.text + '. Я угадал?:)',
+                                    random_id=randint(1, 10 ** 17),
+                                    keyboard=open("keyboards/keyboard_yes_or_no.json", "r", encoding="UTF-8").read(),
+                                    message='Пройти анкету?'
                                 )
+                                valentinka()
                                 break
-                            elif event.from_chat:
-                                vk.messages.send( #Отправляем собщение
-                                    chat_id=event.chat_id,
-                                    random_id=randint(1, 10**17),
-                                    message='Ты выбрал  '+ event.text + '. Я угадал?:)',
-                                )
-                                break
-                        else:
+                        if event.text.lower() == 'расписание':  # Если написали заданную фразу
                             if event.from_user:
-                                vk.messages.send( #Отправляем собщение
+                                vk.messages.send(
                                     user_id=event.user_id,
-                                    random_id=randint(1, 10**17),
-                                    attachment=','.join(attachments),
-                                    message='Это шо такое?',
+                                    random_id=randint(1, 10 ** 17),
+                                    message='Расписание'
                                 )
-                            elif event.from_chat:
-                                vk.messages.send( #Отправляем собщение
-                                    chat_id=event.chat_id,
-                                    random_id=randint(1, 10**17),
-                                    attachment=','.join(attachments),
-                                    message='Это шо такое?',
-                                )
+
             else:
                 if event.from_user:
-                    vk.messages.send( #Отправляем собщение
-                        user_id=event.user_id,
-                        random_id=randint(1, 10**17),
-                        attachment=','.join(attachments),
-                        message='Это шо такое? Напиши "помощь"',
-                    )
+                    neponatno()
                     break
-                elif event.from_chat:
-                    vk.messages.send( #Отправляем собщение
-                        chat_id=event.chat_id,
-                        random_id=randint(1, 10**17),
-                        attachment=','.join(attachments),
-                        message='Это шо такое? Напиши "помощь"',
-                    )
             continue
-    time.sleep(1)               
+    time.sleep(1)
